@@ -128,7 +128,7 @@
                     if (!first){
                         searchParam.pageNum=obj.curr;
                         searchParam.pageSize=obj.limit;
-                        getTableData();
+                        getTableData(false);
                     }
                 }
             });
@@ -176,13 +176,13 @@
         /**
          * 获取table数据
          */
-        var getTableData = function(){
+        var getTableData = function(flag){
             CoreUtil.sendAjax("/manager/roles",searchParam,function (res) {
-                laypageTable(res.data.totalRows,searchParam.pageNum);
+                if(flag){laypageTable(res.data.totalRows,searchParam.pageNum);}
                 loadTable(res.data.list);
             },"GET",false,false);
         };
-        getTableData();
+        getTableData(true);
 
         laydate.render({
             elem: '#createTime'
@@ -196,7 +196,6 @@
                     searchParam.startTime=null;
                     searchParam.endTime=null;
                 }
-
             }
         });
         $("#search").click(function () {

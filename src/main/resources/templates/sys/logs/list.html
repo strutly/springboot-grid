@@ -56,7 +56,7 @@
         var $ = jQuery = layui.jquery;
         var laydate = layui.laydate;
         var CoreUtil = layui.CoreUtil;
-        var flag;
+
         var searchParam= {
             username:null,
             startTime:null,
@@ -67,20 +67,20 @@
             pageSize:10
         };
         //渲染分页插件
-        var laypageTable = function(count,currentPage) {
+        var laypageTable = function(count) {
             laypage.render({
                 elem: 'laypage'
                 , count: count
                 ,limit:searchParam.pageSize
-                ,layout: ['count', 'prev', 'page', 'next', 'limit', 'refresh', 'skip']
+                ,layout: ['count', 'prev', 'page', 'next', 'limit', 'skip']
+                ,limits:[10, 20, 30, 40, 50]
                 ,curr: location.hash.replace('#!currentPage=', '') //获取起始页
                 ,hash: 'currentPage' //自定义hash值
                 , jump: function (obj,first) {
                     if (!first){
-                        flag=true;
                         searchParam.pageNum=obj.curr;
                         searchParam.pageSize=obj.limit;
-                        getTableData();
+                        getTableData(false);
                     }
                 }
             });
@@ -93,11 +93,10 @@
                 ,cols: [
                     [
                         {type: 'checkbox', fixed: 'left'},
-                        {field: 'userId', title: '用户ID', width: 300, sort: true},
-                        {field: 'username', title: '账号', width: 130},
-                        {field: 'operation', title: '用户操作', width: 140},
-                        {field: 'method', title: '请求方法', width: 400},
-                        {field: 'params', title: '请求参数', width: 300},
+                        {field: 'username', title: '账号'},
+                        {field: 'operation', title: '用户操作'},
+                        {field: 'method', title: '请求方法'},
+                        {field: 'params', title: '请求参数'},
                         {field: 'createTime', title: '创建时间'},
                         {width:150,toolbar:"#tool",title:'操作'}
                     ]
@@ -113,15 +112,15 @@
         /**
          * 获取分页数据
          */
-        var getTableData = function(){
+        var getTableData = function(flag){
             CoreUtil.sendAjax("/manager/sys/logs",searchParam,function (res) {
                 loadTable(res.data.list);
                 if(res.data.list !=null){
-                    laypageTable(res.data.totalRows,searchParam.pageNum);
+                    if(flag){laypageTable(res.data.totalRows);}
                 }
             },"GET",false,false);
         };
-        getTableData();
+        getTableData(true);
         //日期范围
         laydate.render({
             elem: '#createTime'
@@ -129,7 +128,6 @@
             ,range: '~'
             ,done: function(value, date, endDate){
                 if(value !=null && value != undefined && value != ""){
-                    console.log(value)
                     searchParam.startTime=value.split("~")[0];
                     searchParam.endTime=value.split("~")[1];
                 }else {
