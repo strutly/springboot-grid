@@ -40,10 +40,6 @@ public class StreetController{
 	@RequiresPermissions("app:street:edit")
 	@LogAnnotation(title = "街道管理", action = "编辑街道信息")
 	public DataResult<PolygonVO> index(@RequestBody @Valid PolygonVO vo) {
-		System.out.println(vo.getMemo());
-		System.out.println(vo.getName());
-		System.out.println("vo.getName()");
-		System.out.println(vo);
 		DataResult<PolygonVO> result = DataResult.success();
 		result.setData(streetService.edit(vo));
 		return result;
