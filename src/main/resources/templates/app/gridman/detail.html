@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+    <script src="/layuiadmin/layui/layui.js"></script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+
+
+    </div>
+</div>
+</body>
+
+<!--还是这个模板引擎好用-->
+<script src="/js/template.js"></script>
+<script>
+    function gridman_detail(id){
+        layui.config({
+            base: '/layuiadmin/'//静态资源所在路径
+        }).extend({
+            CoreUtil : 'core-util/CoreUtil'
+        }).use(['layer','layedit','CoreUtil'], function(){
+            var $ = jQuery = layui.jquery;
+            var layer = layui.layer;
+            var CoreUtil = layui.CoreUtil;
+            var form = layui.form;
+            var layedit = layui.layedit;
+            var loadData = function(){
+                CoreUtil.sendAjax("/manager/street",null,function (res) {
+                    console.log(res);
+                    if(res.data!=null){
+                        var street = res.data;
+                        var center = street.center.split(",");
+                        point_center = new BMap.Point(center[0],center[1]);
+                        map.centerAndZoom(point_center, 16);
+                        var boundary = street.boundary;
+                        var bs = boundary.split("#");
+                        var points = new Array();
+                        $.each(bs,function(index,obj){
+                            var arr = obj.split(",");
+                            points.push(new BMap.Point(arr[0],arr[1]));
+                        });
+                        polygon = new BMap.Polygon(points, street_polygon_style);  //创建多边形
+                        map.addOverlay(polygon);
+                        polygon.addContextMenu(polygonMenu);
+                    }else{
+                        draw(BMAP_DRAWING_POLYGON);
+                        $(".layui-col-md9").removeClass("layui-col-md12");
+                        $(".layui-col-md3").removeClass("layui-hide");
+                        form.render(); //更新全部
+                    }
+                },"GET",false,false);
+            };
+        })
+    }
+</script>
+</html>

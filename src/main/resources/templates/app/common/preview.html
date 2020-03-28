@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+    <script src="/js/panorama/three.min.js"></script>
+    <script src="/js/panorama/photo-sphere-viewer.min.js"></script>
+</head>
+<style>
+    table{
+        text-align: center;
+    }
+    .td_bold{
+        font-weight: bold;
+    }
+</style>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row" id="panorama-container">
+
+    </div>
+    <view class="layui-row" id="pics">
+
+    </view>
+</div>
+</body>
+<script type="text/html" id="preview-detail">
+    <div class="layui-carousel" style="margin: 0 auto;" lay-filter="pics">
+        <div carousel-item="">
+            {{each $data as url}}
+                <div><img style="margin: 0 auto;height: 100%;display: block;max-width: 100%;" src="http://gridpic.tsing-tec.com/{{url}}"></div>
+            {{/each}}
+        </div>
+    </div>
+</script>
+<!--还是这个模板引擎好用-->
+<script src="/layuiadmin/layui/layui.js"></script>
+<script src="/js/template.js"></script>
+<script>
+    var urls = new Array();
+    var height = window.innerHeight - 30;
+    var preview = function(str){
+        console.log(window.innerHeight)
+        layui.use(['carousel', 'form'], function(){
+            var $ = jQuery = layui.jquery;
+            var carousel = layui.carousel;
+            var loadData = function(){
+                urls = str.split(",");
+                if(urls.length>1){
+                    height = height -150;
+                    var html = template('preview-detail', urls);
+                    $("#pics").html(html);
+                    carousel.render({
+                        elem: '.layui-carousel'
+                        ,width: '100%'
+                        ,height: '150'
+                        ,autoplay:false
+                    });
+                }
+                loadPanorama(urls[0])
+            };
+            loadData();
+            carousel.on('change(pics)', function(obj){ //test1来源于对应HTML容器的 lay-filter="test1" 属性值
+                console.log(obj.prevIndex); //上一个条目的索引
+                console.log(obj.item); //当前条目的元素对象
+                loadPanorama(urls[obj.index])
+            });
+        })
+    };
+    var loadPanorama = function(url) {
+        if(url.indexOf("?imageMogr2")!=-1){
+            url = url.substr(0,url.indexOf("?imageMogr2"));
+        }
+        var div = document.getElementById('panorama-container');
+        var PSV = new PhotoSphereViewer({
+            panorama: "http://gridpic.tsing-tec.com/"+url,
+            container: div,
+            time_anim: false,
+            navbar: true,
+            navbar_style:{buttonsHeight:'40px',buttonsWidth:'140px'},
+            size: {
+                width: '100%',
+                height: height
+            }
+        });
+    }
+</script>
+</html>

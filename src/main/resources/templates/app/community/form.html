@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+    <!--申请的key值--><!--  F0i6SrLmHquLVNLCqpExxPrj8mWVdFwx -->
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=AQzdGwhPm0LrbrjckGMOGLPW74eQBqxN"></script>
+    <!--加载鼠标绘制工具-->
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    <!--加载检索信息窗口-->
+    <script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js"></script>
+    <script src="/layuiadmin/layui/layui.js"></script>
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="panel panel-default">
+        <div class="panel-heading title"></div>
+        <div class="layui-row">
+            <div class="layui-col-md9">
+                <div id="map" style="-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;"></div>
+            </div>
+            <div class="layui-col-md3">
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend>赋值和取值</legend>
+                </fieldset>
+                <form class="layui-form layui-form-pane" lay-filter="component-form-group">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入标题" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">介绍</label>
+                        <div class="layui-input-block">
+                            <textarea name="memo" id="memo" placeholder="请输入介绍" class="layui-textarea"></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-layout-admin">
+                        <div class="layui-input-block">
+                            <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit">保存</button>
+                            <button  class="layui-btn layui-btn-primary" id="btn_cancel">返回</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/js/mapindex.js"></script>
+<script>
+ function child(cid) {
+    layui.config({
+        base: '/layuiadmin/'//静态资源所在路径
+    }).extend({
+        CoreUtil : 'core-util/CoreUtil'
+    }).use(['layer','layedit','CoreUtil'], function(){
+        var $ = jQuery = layui.jquery;
+        var layer = layui.layer;
+        var CoreUtil = layui.CoreUtil;
+        var form = layui.form;
+        $("#map").height(window.innerHeight-30);
+        var layedit = layui.layedit;
+
+        layedit.set({
+            uploadImage: {
+                url: '/api/upload/qiniu' //接口url
+                ,type: 'post' //默认post
+            }
+        });
+
+        var index = layedit.build('memo');
+
+        var point_center = new BMap.Point(113.798659,22.690389);
+        map.centerAndZoom(point_center, 16);
+
+        var polygonMenu = new BMap.ContextMenu();
+
+        var txtMenuItem = [{
+            text: '删除重画',
+            callback: function() {
+                map.removeOverlay(polygon);
+                draw(BMAP_DRAWING_POLYGON);
+                $(".layui-col-md9").removeClass("layui-col-md12");
+                $(".layui-col-md3").removeClass("layui-hide");
+                polygon = null;
+            }
+        },
+        {
+            text: '编辑多边形',
+            callback: function() {
+                polygon.enableEditing();
+                $(".layui-col-md9").removeClass("layui-col-md12");
+                $(".layui-col-md3").removeClass("layui-hide");
+                form.render(); //更新全部
+            }
+        }];
+        for(var i=0;i<txtMenuItem.length;i++){
+            polygonMenu.addItem(new BMap.MenuItem(txtMenuItem[i].text,txtMenuItem[i].callback,100));
+        }
+        var polygon = null;
+
+        $("#btn_cancel").click(function () {
+            location.reload();
+        })
+
+        form.on('submit(submit)', function(data){
+            if(null == polygon){
+                layer.msg("请先在地图位置进行编辑绘制");
+                return false;
+            }
+            var params = data.field;
+            var path = polygon.getPath();//Array<Point> 返回多边型的点数组
+            var point = getCenterPoint(path);
+            var center_path = point.lng + "," + point.lat;
+            params.center = center_path;
+            //获得中心点
+            var points = "";
+            for (var i = 0; i < path.length; i++) {
+                if (points == "") {
+                    points = path[i].lng + "," + path[i].lat;
+                } else {
+                    points = path[i].lng + "," + path[i].lat + "#" + points;
+                }
+            }
+            params.boundary = points;
+
+            params.memo = layedit.getContent(index);
+
+            console.log(params);
+            CoreUtil.sendAjax("/manager/street",JSON.stringify(params),function (res) {
+                location.reload();
+            },"POST",'application/json; charset=UTF-8',false);
+            console.log(params);
+            return false;
+        })
+        var overlaycomplete = function(e) {
+            polygon = e.overlay;
+        }
+        drawingManager.addEventListener('overlaycomplete', overlaycomplete);
+
+        var loadData = function(){
+            CoreUtil.sendAjax("/manager/community/"+cid,null,function (res) {
+                console.log(res);
+                if(res.data!=null){
+                    var street = res.data;
+                    var center = street.center.split(",");
+                    point_center = new BMap.Point(center[0],center[1]);
+                    map.centerAndZoom(point_center, 16);
+                    var boundary = street.boundary;
+                    var bs = boundary.split("#");
+                    var points = new Array();
+                    $.each(bs,function(index,obj){
+                        var arr = obj.split(",");
+                        points.push(new BMap.Point(arr[0],arr[1]));
+                    });
+                    polygon = new BMap.Polygon(points, street_polygon_style);  //创建多边形
+                    map.addOverlay(polygon);
+                    polygon.addContextMenu(polygonMenu);
+                }else{
+                    draw(BMAP_DRAWING_POLYGON);
+                    $(".layui-col-md9").removeClass("layui-col-md12");
+                    $(".layui-col-md3").removeClass("layui-hide");
+                    form.render(); //更新全部
+                }
+            },"GET",false,false);
+        };
+        loadData();
+    })
+ }
+</script>
+</html>

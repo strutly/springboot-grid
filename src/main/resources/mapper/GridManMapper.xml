@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tsing.grid.mapper.GridmanMapper">
+
+    <resultMap type="com.tsing.grid.vo.resp.GridmanRespVO" id="GridManMap">
+
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="pic" column="pic" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="INTEGER"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="palce" column="palce" jdbcType="VARCHAR"/>
+        <result property="nation" column="nation" jdbcType="VARCHAR"/>
+        <result property="education" column="education" jdbcType="VARCHAR"/>
+        <result property="blood" column="blood" jdbcType="VARCHAR"/>
+        <result property="jobStatus" column="job_status" jdbcType="VARCHAR"/>
+        <result property="political" column="political" jdbcType="VARCHAR"/>
+        <result property="bsize" column="bsize" jdbcType="VARCHAR"/>
+        <result property="gsize" column="gsize" jdbcType="VARCHAR"/>
+        <result property="tsize" column="tsize" jdbcType="INTEGER"/>
+        <result property="rsize" column="rsize" jdbcType="INTEGER"/>
+        <result property="post" column="post" jdbcType="VARCHAR"/>
+        <result property="belongTeam" column="belong_team" jdbcType="VARCHAR"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="unitName" column="unit_name" jdbcType="VARCHAR"/>
+        <result property="tel" column="tel" jdbcType="VARCHAR"/>
+        <result property="contactMan" column="contact_man" jdbcType="VARCHAR"/>
+        <result property="contactTel" column="contact_tel" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+
+        <collection property="vo" ofType="com.tsing.grid.vo.resp.BelongRespVO" column="id" select="getBelong"></collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, name, pic, sex, phone, birthday, palce, nation, education, blood, job_status, political, bsize, gsize, tsize, rsize, post, belong_team, type, unit_name, tel, contact_man, contact_tel, address
+    </sql>
+    <!--网格员所属 一个网格员可能存在管理多个网格-->
+    <select id="getBelong" resultType="com.tsing.grid.vo.resp.BelongRespVO">
+        select c.id cid,c.name cname,g.id gid,g.name gname from app_community c,app_grid g,app_grid_man m where c.id = g.cid and g.gid = m.id and m.id = #{id}
+    </select>
+
+    <select id="detail" resultMap="GridManMap">
+        SELECT <include refid="Base_Column_List"></include>
+        FROM app_grid_man where id = #{id}
+    </select>
+
+    <select id="getList" resultMap="GridManMap" parameterType="com.tsing.grid.vo.req.GridmanPageVO">
+        SELECT <include refid="Base_Column_List"></include>
+        FROM app_grid_man
+        where
+            app_grid_man.state = 0
+            <if test="name!=null and name!=''">
+                AND name LIKE concat('%',#{name},'%')
+            </if>
+            <if test="phone!=null and phone!=''">
+                AND phone LIKE concat('%',#{phone},'%')
+            </if>
+            <if test="startTime!=null and startTime!=''">
+                AND create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime!=null and endTime!=''">
+                AND create_time &lt;= #{endTime}
+            </if>
+    </select>
+
+    <select id="detail2" resultType="com.tsing.grid.vo.resp.GridmanDataRespVO">
+        select name,tel,phone from app_grid_man where id = #{id}
+    </select>
+
+</mapper>

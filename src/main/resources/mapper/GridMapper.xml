@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tsing.grid.mapper.GridMapper">
+
+    <resultMap type="com.tsing.grid.entity.app.Grid" id="BaseResultMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="cid" column="cid" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="boundary" column="boundary" jdbcType="VARCHAR"/>
+        <result property="center" column="center" jdbcType="VARCHAR"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+        <result property="gid" column="gid" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="GridPage" type="com.tsing.grid.vo.resp.GridPageRespVO">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="cid" column="cid" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="cname" column="cname" jdbcType="VARCHAR"/>
+        <result property="boundary" column="boundary" jdbcType="VARCHAR"/>
+        <result property="center" column="center" jdbcType="VARCHAR"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+        <association property="vo" javaType="com.tsing.grid.vo.resp.GridmanDataRespVO"
+                     select="com.tsing.grid.mapper.GridmanMapper.detail2"
+                     column="ggid">
+        </association>
+    </resultMap>
+
+
+    <select id="selectByCid" resultType="com.tsing.grid.vo.resp.GridRespVO">
+        select name,boundary,center from app_grid where cid = #{cid}
+    </select>
+
+    <select id="detail" resultMap="GridPage">
+        select g.id id,g.cid cid,g.name name,c.name cname,g.boundary boundary,g.center center,g.memo memo,g.gid ggid
+        from app_grid g,app_community c where g.cid = c.id and g.id = #{id}
+    </select>
+
+    <select id="getList" resultMap="GridPage" parameterType="com.tsing.grid.vo.req.GridPageReqVO">
+         select g.id id,g.cid cid,g.name name,c.name cname,g.boundary boundary,g.center center,g.memo memo,g.gid ggid
+            from app_grid g,app_community c where g.cid = c.id
+            <if test="name!=null and name!=''">
+                and g.name like concat('%',#{name},'%')
+            </if>
+            <if test="cid!=null and cid!=''">
+                and g.cid = #{cid}
+            </if>
+            order by g.cid desc
+    </select>
+
+    <!--根据名称查询5条记录-->
+    <select id="findByName" resultType="com.tsing.grid.vo.resp.GridDataRespVO">
+        select g.id id,m.tel mtel,m.name mname,c.name cname,g.name name from app_grid_man m,app_grid g,app_community c where m.id = g.gid and g.cid = c.id and g.name like concat('%',#{name},'%') limit 5
+    </select>
+
+</mapper>

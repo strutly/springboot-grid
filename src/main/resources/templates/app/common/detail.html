@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+</head>
+<style>
+    table{
+        text-align: center;
+    }
+    .td_bold{
+        font-weight: bold;
+    }
+</style>
+<body>
+<div class="layui-fluid">
+
+</div>
+</body>
+<script type="text/html" id="gridman-detail">
+    <table class="layui-table">
+        <tbody>
+        <tr>
+            <td class="td_bold" colspan="5">网格员信息</td>
+        </tr>
+        {{if $data}}
+        <tr>
+            <td class="td_bold">姓名</td>
+            <td >{{name}}</td>
+            <td class="td_bold">性别</td>
+            <td>
+                {{if sex==1}}男{{else}}女{{/if}}
+            </td>
+            <td width="150px" rowspan="4" valign="middle">
+                <img src="{{pic}}" height="150px" width="100%"/>
+            </td>
+        </tr>
+        <tr>
+            <td class="td_bold">管理网格</td>
+            <td>
+                {{each vo as belong}}
+                    {{belong.gname}}&nbsp;
+                {{/each}}
+            </td>
+            <td class="td_bold">管控通号码</td>
+            <td>{{phone}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">出生日期</td>
+            <td>{{birthday | dateFormat:'yyyy-MM-dd'}}</td>
+            <td class="td_bold">籍贯</td>
+            <td>{{palce}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">民族</td>
+            <td>{{nation}}</td>
+            <td class="td_bold">学历</td>
+            <td>{{education}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">所在街道</td>
+            <td>福海街道</td>
+            <td class="td_bold">所在社区</td>
+            <td colspan="2" class="preview">
+                {{each vo as belong}}
+                    {{belong.cname}}&nbsp;
+                {{/each}}
+            </td>
+        </tr>
+        <tr>
+            <td class="td_bold">血型</td>
+            <td>{{blood}}</td>
+            <td class="td_bold">在职状态</td>
+            <td colspan="2">{{jobStatus}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">政治面貌</td>
+            <td>{{political}}</td>
+            <td class="td_bold">管理楼栋数</td>
+            <td colspan="2" >{{bsize}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">楼栋长数量</td>
+            <td>{{gsize}}</td>
+            <td class="td_bold">三小场所数</td>
+            <td colspan="2" >{{tsize}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">房屋套间数</td>
+            <td>{{rsize}}</td>
+            <td class="td_bold">职务</td>
+            <td colspan="2" >{{post}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">所属大队</td>
+            <td>{{belongTeam}}</td>
+            <td class="td_bold">人员类别</td>
+            <td colspan="2" >{{type}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">单位名称</td>
+            <td>{{unitName}}</td>
+            <td class="td_bold">联系电话</td>
+            <td colspan="2" >{{tel}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">紧急联系人</td>
+            <td>{{contactMan}}</td>
+            <td class="td_bold">紧急联系人电话</td>
+            <td colspan="2" >{{contactTel}}</td>
+        </tr>
+        <tr>
+            <td class="td_bold">地址</td>
+            <td colspan="4">{{address}}</td>
+        </tr>
+        {{else}}
+        <tr>
+            <td colspan="5"><span style="color:red;font-weight: bold;">该网格暂无网格员</span></td>
+        </tr>
+        {{/if}}
+        </tbody>
+    </table>
+</script>
+<script type="text/html" id="druger-detail">
+    <div class="layui-row">
+        <div class="layui-col-md6">
+            <div class="layui-fluid">
+            <div class="layui-row">
+                <table class="layui-table">
+                    <tbody>
+                    <tr>
+                        <td colspan="7" class="td_bold">吸毒帮教人员信息</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">姓名</td>
+                        <td>{{name}}</td>
+                        <td class="td_bold">性别</td>
+                        <td >
+                            {{if sex==1}}男{{else}}女{{/if}}
+                        </td>
+                        <td class="td_bold">出生日期</td>
+                        <td>{{birthday | dateFormat:'yyyy-MM-dd'}}</td>
+                        <td width="150px" rowspan="3" valign="middle">
+                            <img src="https://dss0.baidu.com/73t1bjeh1BF3odCf/it/u=2817705449,1787653518&fm=85&s=5831A852EEB377BF8A4C1996030010E2" height="180px" width="150px"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">证件号码</td>
+                        <td  colspan="3">{{cardNo}}</td>
+                        <td class="td_bold">联系方式</td>
+                        <td>{{phone}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">婚姻状况</td>
+                        <td>
+                            {{if marry==1}}已婚{{else}}未婚{{/if}}
+                        </td>
+                        <td class="td_bold">文化程度</td>
+                        <td >{{education}}</td>
+                        <td class="td_bold">民族</td>
+                        <td >{{nation}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">所属社区</td>
+                        <td >{{cname}}</td>
+                        <td class="td_bold">责任社工</td>
+                        <td >{{workerName}}</td>
+                        <td class="td_bold">社工电话</td>
+                        <td colspan="2">{{workerPhone}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">责任网格员</td>
+                        <td >{{if vo}}{{vo.name}}{{else}}<span style="color:red;font-weight: bold;">该网格暂无网格员</span>{{/if}}</td>
+                        <td class="td_bold">所属网格</td>
+                        <td >{{gname}}</td>
+                        <td class="td_bold">网格员电话</td>
+                        <td colspan="2">{{if vo}}{{vo.tel}}{{else}}<span style="color:red;font-weight: bold;">该网格暂无网格员</span>{{/if}}</td>
+                    </tr>
+
+                    <tr>
+                        <td class="td_bold">居住情况</td>
+                        <td colspan="3">
+                            {{if liveStatus==1}}独居{{else if liveStatus==2}}与家人居住{{else}}与朋友/同事合租{{/if}}
+                        </td>
+                        <td class="td_bold">就业情况</td>
+                        <td colspan="2">{{workStatus}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">现居住地址</td>
+                        <td colspan="6">{{address}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">户籍地址</td>
+                        <td colspan="6">{{domicile}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">迁入日期</td>
+                        <td colspan="3">{{intoDate | dateFormat:'yyyy-MM-dd'}}</td>
+                        <td class="td_bold">迁出日期</td>
+                        <td colspan="2">{{outDate | dateFormat:'yyyy-MM-dd'}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold"  rowspan="2">涉毒情况</td>
+                        <td class="td_bold">初次发现日期</td>
+                        <td colspan="2">{{firstTime | dateFormat:'yyyy-MM-dd'}}</td>
+                        <td class="td_bold">滥用毒品种类</td>
+                        <td colspan="2">{{type}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">当前管控地区</td>
+                        <td colspan="2">{{controlArea}}</td>
+                        <td class="td_bold">管控现状</td>
+                        <td colspan="2">{{controlStatus}}</td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">责令社区戒毒/康复情况</td>
+                        <td colspan="6">
+                            {{if exhortStatus==1}}责令社区戒毒{{else if exhortStatus==2}}责令社区康复{{else}}均无{{/if}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold">风险等级</td>
+                        <td colspan="3">
+                            {{if grade==1}}极端风险{{else if grade==2}}高风险{{else if grade==3}}中风险{{else}}低风险{{/if}}
+                        </td>
+                        <td colspan="3"><a href='javascript:druger_history_list("{{id}}")'>历史轨迹</a></td>
+                    </tr>
+                    <tr>
+                        <td class="td_bold preview">多图显示</td>
+                        <td colspan="6" class="panorama">全景图显示</td>
+                    </tr>
+                    <tr id="bot">
+                        <td class="td_bold">备注</td>
+                        <td colspan="6">{{memo}}</td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <div class="layui-fluid">
+            <div class="layui-row">
+                {{include 'gridman-detail' vo}}
+            </div>
+        </div>
+        </div>
+    </div>
+</script>
+<!--还是这个模板引擎好用-->
+<script src="/layuiadmin/layui/layui.js"></script>
+<script src="/js/template.js"></script>
+<script>
+    function detail(id,type){
+        layui.config({
+            base: '/layuiadmin/'//静态资源所在路径
+        }).extend({
+            CoreUtil : 'core-util/CoreUtil'
+        }).use(['layer','layedit','CoreUtil'], function(){
+            var $ = jQuery = layui.jquery;
+            var layer = layui.layer;
+            var CoreUtil = layui.CoreUtil;
+            var form = layui.form;
+            var loadData = function(){
+                var url = "/manager/"+type+"/"+id;
+                CoreUtil.sendAjax(url,null,function (res) {
+                    var html = template(type+'-detail', res.data);
+                    $(".layui-fluid").html(html);
+
+                    form.render();
+                },"GET",false,false);
+            };
+            loadData();
+
+            $(".panorama").click(function () {
+                var urls = "FgJu-KeN42eFGFUUEFQBnuA9yd93,FvmWlBPZ_jTf1JQ3CgLyzDN6HBrM,Fhxvi1_d9gYxcaHf6N20TlBR2fYV,Ft4BYA0Jg5mu3eIkKFv1TkbLYzof";
+
+                var ifr = layer.open({
+                    title: "图片详细",
+                    type: 2,
+                    content: '/home/app/common/preview',
+                    area: ['800px', '100%'],
+                    maxmin: true,
+                    success: function (layero, index) {
+
+                        // 获取子页面的iframe
+                        var iframe = window['layui-layer-iframe' + index];
+                        //向子页面的全局函数child传参
+                        iframe.preview(urls)
+                    }
+                });
+                layer.full(ifr);
+            })
+
+            $(".preview").click(function () {
+                var urls = "FgJu-KeN42eFGFUUEFQBnuA9yd93,FvmWlBPZ_jTf1JQ3CgLyzDN6HBrM,Fhxvi1_d9gYxcaHf6N20TlBR2fYV,Ft4BYA0Jg5mu3eIkKFv1TkbLYzof";
+
+                var jsons = {"title": "详细", //相册标题
+                    "id": 123, //相册id
+                    "start": 0, //初始显示的图片序号，默认0
+                };
+                var arr = new Array();
+                $.each(urls.split(","),function (i,src) {
+                    arr.push(
+                        {
+                            "alt": "图片名",
+                            "pid": i, //图片id
+                            "src": "http://gridpic.tsing-tec.com/"+src, //原图地址
+                            "thumb": "http://gridpic.tsing-tec.com/"+src+"?imageMogr2/thumbnail/180x150!" //缩略图地址
+                        }
+                    )
+                });
+                jsons.data = arr;
+                layer.photos({
+                    photos: jsons
+                    ,anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
+                    ,tab: function(pic, layero){
+                        console.log(pic) //当前图片的一些信息
+                    }
+                });
+
+
+
+            })
+        })
+    }
+</script>
+</html>

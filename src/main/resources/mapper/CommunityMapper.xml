@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tsing.grid.mapper.CommunityMapper">
+    <!--社区信息-->
+    <resultMap type="com.tsing.grid.entity.app.Community" id="BaseResultMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="boundary" column="boundary" jdbcType="VARCHAR"/>
+        <result property="center" column="center" jdbcType="VARCHAR"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 统计页面 附带网格信息以及吸毒人员信息-->
+    <resultMap type="com.tsing.grid.vo.resp.CommunityRespVO" id="BaseResultMap2">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="boundary" column="boundary" jdbcType="VARCHAR"/>
+        <result property="center" column="center" jdbcType="VARCHAR"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+
+        <collection property="grids" ofType="com.tsing.grid.vo.resp.GridRespVO" column="id" select="com.tsing.grid.mapper.GridMapper.selectByCid"></collection>
+
+        <collection property="drugers" ofType="com.tsing.grid.vo.resp.map.DrugerMapRespVo" column="id" select="com.tsing.grid.mapper.DrugerMapper.selectByCid"></collection>
+    </resultMap>
+
+    <!--统计查询获取社区网格吸毒人员等信息-->
+    <select id="statistics" resultMap="BaseResultMap2">
+        select id,name,boundary,center,memo from app_community
+    </select>
+
+    <!--社区详细,附带网格信息-->
+    <resultMap type="com.tsing.grid.vo.resp.CommunityRespVO" id="BaseResultMap3">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="boundary" column="boundary" jdbcType="VARCHAR"/>
+        <result property="center" column="center" jdbcType="VARCHAR"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+        <collection property="grids" ofType="com.tsing.grid.vo.resp.GridRespVO" column="id" select="com.tsing.grid.mapper.GridMapper.selectByCid"></collection>
+    </resultMap>
+
+    <!--社区详细,附带网格信息-->
+    <resultMap type="com.tsing.grid.vo.resp.CommunityRespVO" id="BaseResultMap4">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="boundary" column="boundary" jdbcType="VARCHAR"/>
+        <result property="center" column="center" jdbcType="VARCHAR"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+
+        <collection property="grids" ofType="com.tsing.grid.vo.resp.GridRespVO">
+            <result column="g_name" property="name"/>
+            <result column="g_boundary" property="boundary"/>
+            <result column="g_center" property="center"/>
+        </collection>
+    </resultMap>
+
+    <!--获取社区详细信息 此方法优于下方的一次查询-->
+    <select id="findAndGrids" resultMap="BaseResultMap3">
+        select id,name,boundary,center,memo from app_community where id = #{id}
+    </select>
+
+    <!--获取社区详细信息-->
+    <select id="findAndGrids2" resultMap="BaseResultMap4">
+        select c.id id,c.name name,c.boundary,c.center,c.memo,g.name g_name,g.boundary g_boundary,g.center g_center from app_community c,app_grid g where g.cid = c.id and c.id =#{id};
+    </select>
+
+
+    <sql id="Base_Column_List">
+        id, `name`,boundary, center, memo,create_time, update_time
+    </sql>
+
+    <!--根据名称查询社区-->
+    <select id="findByName" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"></include>
+        FROM  app_community WHERE name = #{name}
+    </select>
+</mapper>

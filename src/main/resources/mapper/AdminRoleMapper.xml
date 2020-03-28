@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tsing.grid.mapper.AdminRoleMapper">
+  <resultMap id="BaseResultMap" type="com.tsing.grid.entity.sys.AdminRole">
+    <result column="aid" jdbcType="INTEGER" property="aid" />
+    <result column="rid" jdbcType="INTEGER" property="rid" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <insert id="setAdminRole" parameterType="com.tsing.grid.entity.sys.AdminRole">
+    INSERT INTO sys_admin_role (rid,aid,create_time)
+    VALUES
+    <foreach item="item" collection="list" index="index" separator=",">
+      (#{item.rid},#{item.aid},#{item.createTime})
+    </foreach>
+  </insert>
+  <!--根据账号id获取角色id集合-->
+  <select id="getRidsByAid" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    SELECT rid FROM sys_admin_role WHERE aid = #{aid}
+  </select>
+
+  <!--根据角色id删除关联-->
+  <delete id="deleteByRid" parameterType="java.lang.Integer">
+    DELETE FROM sys_admin_role WHERE rid = #{rid}
+  </delete>
+
+  <!--根据账号id删除关联-->
+  <delete id="deleteByAid" parameterType="java.lang.Integer">
+    DELETE FROM sys_admin_role WHERE aid = #{aid}
+  </delete>
+
+</mapper>

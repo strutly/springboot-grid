@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/layuiadmin/layui/css/layui.css" media="all">
+    <script src="/layuiadmin/layui/layui.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=AQzdGwhPm0LrbrjckGMOGLPW74eQBqxN"></script>
+    <!--加载鼠标绘制工具-->
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    <!--加载检索信息窗口-->
+    <script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js"></script>
+
+</head>
+<style>
+    table{
+        text-align: center;
+    }
+    .td_bold{
+        font-weight: bold;
+    }
+    .pic_box{
+        position: relative;
+        float: left;
+    }
+    .background{
+        height:120px;
+        float:left;
+        margin-right:20px;
+    }
+    .removeHead{
+        position: absolute;
+        font-size: 28px;
+        right: -5px;
+        top: 6px;
+        color: #e85858;
+    }
+    .removeImg{
+        position: absolute;
+        font-size: 28px;
+        right: 6px;
+        top: -6px;
+        color: #e85858;
+    }
+</style>
+<body>
+<div class="layui-fluid">
+
+</div>
+</body>
+<script type="text/html" id="druger-form">
+    <div class="layui-form">
+    <form id="form-body" autocomplete="off">
+       <input type="hidden" id="id" name="id" value="{{id}}"/>
+       <input type="hidden" name="status" value="0"/>
+       <input type="hidden" name="gid" id="gid" value="{{gid}}"/>
+       <input type="hidden" name="latitude" id="latitude" value="{{latitude}}"/>
+       <input type="hidden" name="longitude" id="longitude" value="{{longitude}}"/>
+        <table class="layui-table" lay-size="sm">
+            <tbody>
+            <tr>
+                <td>姓名</td>
+                <td>
+                    <input type="text" name="name" id="name" value="{{name}}" class="layui-input" lay-verify="required" lay-verType="alert">
+                </td>
+                <td>性别</td>
+                <td>
+                    <select name="sex" id="sex">
+                        <option value="0" {{if sex==0}}selected{{/if}}>请选择性别</option>
+                        <option value="1" {{if sex==1}}selected{{/if}}>男</option>
+                        <option value="2" {{if sex==2}}selected{{/if}}>女</option>
+                    </select>
+                </td>
+                <td>出生日期</td>
+                <td><input type="text"  id="birthday" name="birthday" value='{{birthday}}'class="layui-input layui-date"/></td>
+                <td rowspan="3" valign="middle" style="position: relative;width: 100px;">
+                    <i class="layui-icon layui-icon-close-fill removeHead"></i>
+                    <img src="{{if pic}}{{pic}}{{else}}/images/add.png{{/if}}" alt="点击上传图片"  class="head"  height="120px" width="100%"/>
+                    <input type="hidden" id="pic"  name="pic" value=""  lay-verify="headImg" lay-reqText="头像不能为空">
+                </td>
+            </tr>
+            <tr>
+                <td>证件号码</td>
+                <td colspan="2"><input name="cardNo" id="cardNo" placeholder="外籍人士请直接输入外籍人士" value="{{cardNo}}" class="layui-input"  lay-verify="required"></td>
+                <td>联系方式</td>
+                <td colspan="2"><input name="phone" id="phone" value="{{phone}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>婚姻状况</td>
+                <td>
+                    <select name="marry" id="marry">
+                        <option value="1" {{if marry==1}}selected{{/if}}>已婚</option>
+                        <option value="2" {{if marry==2}}selected{{/if}}>未婚</option>
+                    </select>
+                </td>
+                <td>文化程度</td>
+                <td>
+                    <select name="education" id="education">
+                        <option value="暂不选择">暂不选择</option>
+                        <option value="初中以下" {{if education=='初中以下'}}selected{{/if}}>初中以下</option>
+                        <option value="初中" {{if education=='初中'}}selected{{/if}}>初中</option>
+                        <option value="高中" {{if education=='高中'}}selected{{/if}}>高中</option>
+                        <option value="中专" {{if education=='中专'}}selected{{/if}}>中专</option>
+                        <option value="大专" {{if education=='大专'}}selected{{/if}}>大专</option>
+                        <option value="本科" {{if education=='本科'}}selected{{/if}}>本科</option>
+                        <option value="研究生" {{if education=='研究生'}}selected{{/if}}>研究生</option>
+                        <option value="博士" {{if education=='博士'}}selected{{/if}}>博士</option>
+                    </select>
+                </td>
+                <td>民族</td>
+                <td><input name="nation" id="nation" value="{{nation}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>所属网格</td>
+                <td>
+                    <div class="layui-form-select searchDiv">
+                        <div class="layui-select-title"><input type="text" placeholder="直接选择或搜索选择" value="{{gname}}" class="layui-input search_input" id="search_input"></div>
+                        <dl class="layui-anim layui-anim-upbit">
+
+                        </dl>
+                    </div>
+                </td>
+                <td>网格员</td>
+                <td>
+                    <div class="layui-form">
+                    <input id="mname" readonly="readonly" value="{{if vo}}{{vo.name}}{{/if}}" class="layui-input">
+                    </div>
+                </td>
+                <td>网格员电话</td>
+                <td colspan="2"><input id="mtel" readonly="readonly" value="{{if vo}}{{vo.tel}}{{/if}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>所属社区</td>
+                <td><input readonly="readonly" id="cname" value="{{cname}}" class="layui-input"/></td>
+                <td>责任社工</td>
+                <td><input name="workerName" id="workerName" value="{{workerName}}" class="layui-input"></td>
+                <td>社工电话</td>
+                <td colspan="2"><input name="workerPhone" id="workerPhone" value="{{workerPhone}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>居住情况</td>
+                <td colspan="3">
+                    <select name="liveStatus" id="liveStatus">
+                        <option value="1" {{if liveStatus==1}}selected{{/if}}>独居</option>
+                        <option value="2" {{if liveStatus==2}}selected{{/if}}>与家人居住</option>
+                        <option value="3" {{if liveStatus==3}}selected{{/if}}>与朋友/同事合租</option>
+                    </select>
+                </td>
+                <td>就业情况</td>
+                <td colspan="2"><input name="workStatus" id="workStatus" value="{{workStatus}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>现居住地址</td>
+                <td colspan="6"><input name="address" id="address" value="{{address}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>户籍地址</td>
+                <td colspan="6"><input name="domicile" id="domicile" value="{{domicile}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>搬入日期</td>
+                <td colspan="3"><input type="text"  id="intoDate" name="intoDate" value='{{intoDate}}' class="layui-input layui-date"/></td>
+                <td>迁出日期</td>
+                <td colspan="2"><input type="text"  id="outDate" name="outDate" value='{{outDate}}' class="layui-input layui-date"/></td>
+            </tr>
+            <tr>
+                <td  rowspan="2">涉毒情况</td>
+                <td>初次发现日期</td>
+                <td colspan="2"><input type="text"  id="firstTime" name="firstTime" value='{{firstTime}}' class="layui-input layui-date"/></td>
+                <td>滥用毒品种类</td>
+                <td colspan="2"><input name="type" id="type" value="{{type}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>当前管控地区</td>
+                <td colspan="2"><input name="controlArea" id="controlArea" value="{{controlArea}}" class="layui-input"></td>
+                <td>管控现状</td>
+                <td colspan="2"><input name="controlStatus" id="controlStatus" value="{{controlStatus}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td>责令社区戒毒/康复情况</td>
+                <td colspan="6">
+                    <select name="exhortStatus" id="exhortStatus">
+                        <option value="1" {{if exhortStatus==1}}selected{{/if}}>责令社区戒毒</option>
+                        <option value="2" {{if exhortStatus==2}}selected{{/if}}>责令社区康复</option>
+                        <option value="2" {{if exhortStatus==3}}selected{{/if}}>均无</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>分类分级情况</td>
+                <td colspan="6">
+                    <select name="grade" id="grade">
+                        <option value="1" {{if grade==1}}selected{{/if}}>极端风险</option>
+                        <option value="2" {{if grade==2}}selected{{/if}}>高风险</option>
+                        <option value="3" {{if grade==3}}selected{{/if}}>中风险</option>
+                        <option value="4" {{if grade==4}}selected{{/if}}>低风险</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td class="td_bold" style="vertical-align: middle;">多图上传测试</td>
+                <td colspan="6" valign="middle">
+                    {{set temp = split('http://gridpic.tsing-tec.com/Fg_0UWFyG_0sGctOyzKeGDhY-htF,http://gridpic.tsing-tec.com/Fg1d_LOD_G6ZMxbuqguwlNhRTHIv',',')}}
+                    {{each temp as src}}
+                        <div class="pic_box">
+                            <i class="layui-icon layui-icon-close-fill removeImg" data-src="{{src}}"></i>
+                            <img class="background" src="{{src}}">
+                        </div>
+                    {{/each}}
+                    <!-- 最多多少张图片 -->
+                    <div class='pic-num' style="float:right;width: fit-content;"><span>{{temp.length}}</span>/<span>3</span></div>
+                    <img src="/images/add.png" alt="点击上传图片"  class="background addImg"/>
+                    <input class="value-input" type="hidden" name="addressPics" value="http://gridpic.tsing-tec.com/Fg_0UWFyG_0sGctOyzKeGDhY-htF,http://gridpic.tsing-tec.com/Fg1d_LOD_G6ZMxbuqguwlNhRTHIv">
+                </td>
+            </tr>
+
+            <tr>
+                <td class="td_bold" style="vertical-align: middle;">多图上传测试</td>
+                <td colspan="6" valign="middle">
+                    {{set temp = split('http://gridpic.tsing-tec.com/Fg_0UWFyG_0sGctOyzKeGDhY-htF,http://gridpic.tsing-tec.com/Fg1d_LOD_G6ZMxbuqguwlNhRTHIv',',')}}
+                    {{each temp as src}}
+                    <div class="pic_box">
+                        <i class="layui-icon layui-icon-close-fill removeImg" data-src="{{src}}"></i>
+                        <img class="background" src="{{src}}">
+                    </div>
+                    {{/each}}
+                    <!-- 最多多少张图片 -->
+                    <div class='pic-num' style="float:right;width: fit-content;"><span>{{temp.length}}</span>/<span>3</span></div>
+                    <img src="/images/add.png" alt="点击上传图片"  class="background addImg"/>
+                    <input class="value-input" type="hidden" name="addressPics" value="http://gridpic.tsing-tec.com/Fg_0UWFyG_0sGctOyzKeGDhY-htF,http://gridpic.tsing-tec.com/Fg1d_LOD_G6ZMxbuqguwlNhRTHIv">
+                </td>
+            </tr>
+
+            <tr>
+                <td>备注</td>
+                <td colspan="6"><input name="memo" id="memo" value="{{memo}}" class="layui-input"></td>
+            </tr>
+            <tr>
+                <td colspan="7" height="400px;">
+                    <div id="map" style="height:400px;-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;"></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="layui-form-item layui-layout-admin">
+            <div class="layui-input-block">
+                <div class="layui-footer" style="left: 0;text-align: center;">
+                    <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+</script>
+<!--还是这个模板引擎好用-->
+<script src="/js/template.js"></script>
+<script src="/layuiadmin/layui/layui.js"></script>
+<script>
+function drugerForm(data){
+    console.log(data);
+    layui.config({
+        base: '/layuiadmin/'//静态资源所在路径
+    }).extend({
+        CoreUtil : 'core-util/CoreUtil',
+        ImgUpload :'img-upload/ImgUpload'
+    }).use(['layer','layedit','CoreUtil','laydate','upload','ImgUpload'], function(){
+        var $ = jQuery = layui.jquery;
+        var layer = layui.layer;
+        var CoreUtil = layui.CoreUtil;
+        var form = layui.form;
+        var laydate = layui.laydate;
+        var ImgUpload = layui.ImgUpload;
+
+        var loadData = function(){
+            //不知道为啥要进行这么一次操作!
+            var druger = JSON.parse(JSON.stringify(data));
+            var html = template('druger-form', druger);
+            $(".layui-fluid").html(html);
+
+            $('.layui-date').each(function(){
+                laydate.render({
+                    elem: this
+                    ,trigger: 'click'
+                });
+            });
+            /**
+             * 添加图片上传
+             */
+            ImgUpload();
+            form.render();
+        };
+        loadData();
+
+        var oldValue = null;
+        $(".search_input").keyup(function(event){
+            var input = $(this);
+            /*中文加数字*/
+            var reg = new RegExp("^[0-9\u4e00-\u9fa5]+$");
+            var val = $(this).val().trim();
+            if(val!=''&& reg.test(val)){ //如果输入框的值没有改变就没必要发送ajax请求
+                //根据用户输入的内容发送ajax请求查询以此内容开头的商品简码，从而查出符合要求的商品名字
+                CoreUtil.sendAjax("/manager/grids/"+val,null,function (res) {
+                    var data = res.data;
+
+                    $(".searchDiv dl.layui-anim").html("");
+
+                    $.each(data,function(i,grid){
+                        $(".searchDiv").find("dl.layui-anim").append("<dd data-id='"+grid.id+"' data-cname='"+grid.cname+"' data-name='"+grid.name+"' data-mname='"+grid.mname+"' data-mtel='"+grid.mtel+"' lay-value="+grid.name +">"+grid.name+"</dd>");
+                    })
+                    $(".searchDiv").find("dl.layui-anim").children("dd:first").addClass("layui-this");
+
+                    $(".searchDiv dl.layui-anim dd").click(function(){
+                        var obj = $(this);
+                        var id = $(obj).data("id");
+                        var name = $(obj).data("name");
+                        var cname = $(obj).data("cname");
+                        var mname = $(obj).data("mname");
+                        var mtel = $(obj).data("mtel");
+
+                        $("#gid").val(id);
+                        $(input).val(name);
+                        $("#cname").val(cname);
+                        $("#mname").val(mname);
+                        $("#mtel").val(mtel);
+                        $(".searchDiv dl").hide();
+                    });
+                    $(".searchDiv dl").show();
+                },"GET",false,false);
+            }
+        });
+
+
+        var changeSearchText = function(){
+            console.log(1);
+        }
+
+
+
+        var initbaidumap = function() {
+            var marker,themap,pt;
+            // 百度地图API功能
+            themap = new BMap.Map("map", {
+                enableMapClick: false
+            });
+            themap.enableScrollWheelZoom(); //启用滚轮放大缩小，默认禁用
+            themap.enableContinuousZoom();
+            themap.addControl(new BMap.MapTypeControl());
+
+            var regionLng = $('#longitude').val();
+            var regionLat = $('#latitude').val();
+
+            if(regionLng > 0 && regionLat > 0){
+                var point = new BMap.Point(regionLng,regionLat);
+                themap.centerAndZoom(point, 18);
+                marker = new BMap.Marker(point); // 创建标注
+                themap.addOverlay(marker); // 将标注添加到地图中
+            }else{
+                var point_center = new BMap.Point(113.798659,22.690389);
+                themap.centerAndZoom(point_center, 16);
+            }
+
+            themap.addEventListener("click", function(event) {
+                pt = event.point;
+                $("#latitude").val(pt.lat);
+                $("#longitude").val(pt.lng);
+                themap.removeOverlay(marker);
+                marker = new BMap.Marker(pt); // 创建标注
+                themap.addOverlay(marker); // 将标注添加到地图中
+                marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+            });
+        };
+        initbaidumap();
+
+        form.verify({
+            //数组的两个值分别代表：[正则匹配、匹配不符时的提示文字]
+            headImg: [
+                /\s+/g
+                ,'请上传头像'
+            ]
+        });
+
+        form.on('submit(demo1)', function(data){
+            layer.alert(JSON.stringify(data.field), {
+                title: '最终的提交信息'
+            })
+            return false;
+        });
+    })
+}
+</script>
+</html>

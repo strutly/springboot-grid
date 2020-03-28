@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tsing.grid.mapper.DrugerMapper">
+
+    <sql id="Base_Column_List">
+        d.*,c.name as cname,g.name as gname,g.gid as ggid
+    </sql>
+
+    <resultMap type="com.tsing.grid.vo.resp.DrugerDetailResp" id="DrugerDetail">
+
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="INTEGER"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="cardNo" column="card_no" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="pic" column="pic" jdbcType="VARCHAR"/>
+        <result property="marry" column="marry" jdbcType="INTEGER"/>
+        <result property="education" column="education" jdbcType="VARCHAR"/>
+        <result property="nation" column="nation" jdbcType="VARCHAR"/>
+        <result property="workerName" column="worker_name" jdbcType="VARCHAR"/>
+        <result property="workerPhone" column="worker_phone" jdbcType="VARCHAR"/>
+        <result property="liveStatus" column="live_status" jdbcType="INTEGER"/>
+        <result property="workStatus" column="work_status" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="domicile" column="domicile" jdbcType="VARCHAR"/>
+        <result property="intoDate" column="into_date" jdbcType="TIMESTAMP"/>
+        <result property="outDate" column="out_date" jdbcType="TIMESTAMP"/>
+        <result property="firstTime" column="first_time" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="controlArea" column="control_area" jdbcType="VARCHAR"/>
+        <result property="controlStatus" column="control_status" jdbcType="VARCHAR"/>
+        <result property="exhortStatus" column="exhort_status" jdbcType="INTEGER"/>
+        <result property="grade" column="grade" jdbcType="INTEGER"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+        <result property="latitude" column="latitude" jdbcType="NUMERIC"/>
+        <result property="longitude" column="longitude" jdbcType="NUMERIC"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+
+        <!--一次性查询吸毒人员信息并且加载网格员信息-->
+        <association property="vo" javaType="com.tsing.grid.vo.resp.GridmanRespVO"
+                     select="com.tsing.grid.mapper.GridmanMapper.detail"
+                     column="ggid">
+        </association>
+
+    </resultMap>
+
+    <!---->
+    <resultMap type="com.tsing.grid.vo.resp.DrugerPageRespVO" id="DrugerPage">
+
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="INTEGER"/>
+        <result property="birthday" column="birthday" jdbcType="TIMESTAMP"/>
+        <result property="cardNo" column="card_no" jdbcType="VARCHAR"/>
+        <result property="phone" column="phone" jdbcType="VARCHAR"/>
+        <result property="pic" column="pic" jdbcType="VARCHAR"/>
+        <result property="marry" column="marry" jdbcType="INTEGER"/>
+        <result property="education" column="education" jdbcType="VARCHAR"/>
+        <result property="nation" column="nation" jdbcType="VARCHAR"/>
+        <result property="workerName" column="worker_name" jdbcType="VARCHAR"/>
+        <result property="workerPhone" column="worker_phone" jdbcType="VARCHAR"/>
+        <result property="liveStatus" column="live_status" jdbcType="INTEGER"/>
+        <result property="workStatus" column="work_status" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="domicile" column="domicile" jdbcType="VARCHAR"/>
+        <result property="intoDate" column="into_date" jdbcType="TIMESTAMP"/>
+        <result property="outDate" column="out_date" jdbcType="TIMESTAMP"/>
+        <result property="firstTime" column="first_time" jdbcType="TIMESTAMP"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="controlArea" column="control_area" jdbcType="VARCHAR"/>
+        <result property="controlStatus" column="control_status" jdbcType="VARCHAR"/>
+        <result property="exhortStatus" column="exhort_status" jdbcType="INTEGER"/>
+        <result property="grade" column="grade" jdbcType="INTEGER"/>
+        <result property="memo" column="memo" jdbcType="VARCHAR"/>
+        <result property="latitude" column="latitude" jdbcType="NUMERIC"/>
+        <result property="longitude" column="longitude" jdbcType="NUMERIC"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+
+        <!--一次性查询吸毒人员信息并且加载网格员信息-->
+        <association property="vo" javaType="com.tsing.grid.vo.resp.GridmanDataRespVO"
+                     select="com.tsing.grid.mapper.GridmanMapper.detail2"
+                     column="ggid">
+        </association>
+
+    </resultMap>
+
+    <!---根据社区id查询吸毒人员信息-->
+    <select id="selectByCid" resultType="com.tsing.grid.vo.resp.map.DrugerMapRespVo">
+        select app_druger.id id,app_druger.name name,app_druger.latitude latitude,app_druger.longitude longitude,app_druger.status status from app_druger,app_grid,app_community where app_community.id = app_grid.cid and app_druger.gid = app_grid.id and app_community.id = #{cid}
+    </select>
+
+    <!--根据分页条件查询列表-->
+    <select id="findPage" parameterType="com.tsing.grid.vo.req.DrugerPageVO" resultMap="DrugerPage">
+        select <include refid="Base_Column_List"></include>
+        from app_community as c,app_grid as g ,app_druger as d where g.cid = c.id and  d.gid=g.id and d.state = 0
+        <if test="name!=null and name!=''">
+            AND d.name LIKE concat('%',#{name},'%')
+        </if>
+        <if test="cardNo!=null and cardNo!=''">
+            AND d.card_no LIKE concat('%',#{cardNo},'%')
+        </if>
+        <if test="status!=null and status!=''">
+            AND d.status = #{status}
+        </if>
+        <if test="cid!=null and cid!=''">
+            AND c.id = #{cid}
+        </if>
+        <if test="name!=null and name!=''">
+            AND d.name LIKE concat('%',#{name},'%')
+        </if>
+        <if test="gridName!=null and gridName!=''">
+            AND g.name LIKE concat('%',#{gridName},'%')
+        </if>
+        <if test="gid!=null and gid!=''">
+            AND g.id = #{gid}
+        </if>
+        <if test="startTime!=null and startTime!=''">
+            AND g.create_time &gt;= #{startTime}
+        </if>
+        <if test="endTime!=null and endTime!=''">
+            AND g.create_time &lt;= #{endTime}
+        </if>
+        order by d.create_time desc
+    </select>
+
+    <!--根据id获取吸毒人员详细<include refid="Base_Column_List"></include>-->
+    <select id="detail" resultMap="DrugerDetail">
+        select d.*,c.name as cname,g.name as gname,g.gid as ggid
+        from app_community as c,app_grid as g ,app_druger as d where g.cid = c.id and  d.gid=g.id  and d.state = 0
+        and d.id = #{id}
+    </select>
+
+    <!--根据社区统计数量-->
+    <select id="chartByCid" resultType="com.tsing.grid.vo.resp.ChartDataRespVO">
+        select app_community.name name,count(*) value from app_community,app_grid,app_druger where app_grid.cid = app_community.id and app_druger.gid = app_grid.id and app_druger.state=0 group by app_community.id
+    </select>
+
+    <!--根据风险等级统计数量-->
+    <select id="chartByGrade" resultType="com.tsing.grid.vo.resp.ChartDataRespVO">
+        select grade name,count(*) value from app_druger where state=0 group by grade
+    </select>
+
+    <!--根据吸毒年份进行统计-->
+    <select id="chartByTime"  resultType="com.tsing.grid.vo.resp.ChartDataRespVO">
+        select a.times name,count(*) value from (
+            select
+                case
+                    when ABS(TIMESTAMPDIFF(YEAR,first_time,now())) between 0 and 1 then '1年内'
+                    when ABS(TIMESTAMPDIFF(YEAR,first_time,now())) between 1 and 2 then '1~2年'
+                    when ABS(TIMESTAMPDIFF(YEAR,first_time,now())) between 2 and 3 then '2~3年'
+                    when ABS(TIMESTAMPDIFF(YEAR,first_time,now()))>3 then '3年以上'
+                else '未知' end as times
+            from app_druger where state = 0) as a
+        group by a.times
+    </select>
+
+</mapper>

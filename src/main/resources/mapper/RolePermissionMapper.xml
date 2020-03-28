@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tsing.grid.mapper.RolePermissionMapper">
+  <resultMap id="BaseResultMap" type="com.tsing.grid.entity.sys.RolePermission">
+    <result column="rid" jdbcType="VARCHAR" property="rid" />
+    <result column="pid" jdbcType="VARCHAR" property="pid" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <select id="getPidsByRids" resultType="java.lang.Integer">
+    SELECT pid
+    from sys_role_permission
+    where rid in
+    <foreach item="item" collection="list" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="getRoleIds" resultType="java.lang.Integer">
+    select role_id
+    from sys_role_permission
+    where pid = #{permissionId}
+  </select>
+
+  <select id="getPermissionIdsByRoleId" resultType="java.lang.Integer">
+    select pid
+    from sys_role_permission
+    where rid = #{rid}
+  </select>
+
+  <delete id="deleteByRid" parameterType="java.lang.Integer">
+    DELETE FROM sys_role_permission WHERE rid = #{rid}
+  </delete>
+
+  <delete id="deleteByPid" parameterType="java.lang.Integer">
+    DELETE FROM sys_role_permission WHERE pid = #{pid}
+  </delete>
+
+  <insert id="setRolePermission" parameterType="com.tsing.grid.entity.sys.RolePermission">
+    INSERT INTO sys_role_permission (rid,pid,create_time) VALUES
+     <foreach item="item" collection="list" index="index" separator=",">
+      (#{item.rid}, #{item.pid},#{item.createTime})
+    </foreach>
+  </insert>
+
+</mapper>
