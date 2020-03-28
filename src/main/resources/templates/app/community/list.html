@@ -73,9 +73,8 @@
         /**
          * 翻页
          * @param count
-         * @param currentPage
          */
-        var laypageTable = function(count,currentPage) {
+        var laypageTable = function(count) {
             laypage.render({
                 elem: 'laypage'
                 ,count: count
@@ -87,7 +86,7 @@
                     if (!first){
                         searchParam.pageNum=obj.curr;
                         searchParam.pageSize=obj.limit;
-                        getTableData();
+                        getTableData(false);
                     }
                 }
             });
@@ -117,18 +116,18 @@
         /**
          * 分页获取账号
          */
-        var getTableData = function(){
+        var getTableData = function(flag){
             CoreUtil.sendAjax("/manager/communities",searchParam,function (res) {
                 loadTable(res.data.list);
                 if(res.data.list !=null){
-                    laypageTable(res.data.totalRows,searchParam.pageNum);
+                    if(flag){laypageTable(res.data.totalRows);}
                 }
             },"GET",false,false);
         };
         /**
          *获取一次数据
          */
-        getTableData();
+        getTableData(true);
         /**
          * 时间切换
          */
@@ -153,7 +152,7 @@
         $("#search").click(function () {
             searchParam.name=$("#name").val();
             searchParam.pageNum=1;
-            getTableData();
+            getTableData(true);
         });
         /**
          * 头部工具栏

@@ -203,7 +203,7 @@
             searchParam.status=$("#status").val();
             searchParam.roleName=$("#roleName").val();
             searchParam.pageNum=1;
-            getTableData();
+            getTableData(true);
         });
         table.on('toolbar(role_table)',function (obj) {
             var data = obj.data;
